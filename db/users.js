@@ -29,11 +29,13 @@ async function deleteUser(id) {
   return result;
 }
 
-async function editImage(image, id) {
+async function editDetails(username, email, image, id) {
   const imageBuffer = await fs.readFile(image.path);
   const result = await pool.query(
-    "UPDATE users SET user_image = ? WHERE user_id = ?",
-    [imageBuffer, id]
+    "UPDATE users SET username = ?, user_email = ?, user_image = ? WHERE user_id = ?",
+    [username, email, imageBuffer, id]
   );
   return result;
 }
+
+module.exports = { getUser, addUser, updatePassword, editDetails, deleteUser };
