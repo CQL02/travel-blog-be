@@ -19,7 +19,6 @@ async function addPost(user_id, title, image, description, country) {
   return result;
 }
 
-// update post page
 /**
  * function to update post
  * @param {String} title
@@ -221,6 +220,7 @@ async function getTopHomeRecommand() {
 module.exports = {
   addPost,
   updatePost,
+  getPostByID,
   getSearch,
   getPostByCountry,
   getPostByUserID,

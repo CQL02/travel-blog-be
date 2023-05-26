@@ -7,8 +7,10 @@ var cors = require("cors");
 var dotenv = require("dotenv");
 
 dotenv.config();
-var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
+var blogRouter = require("./routes/blog");
+var statsRouter = require("./routes/stats");
+var viewRouter = require("./routes/view");
 
 var app = express();
 
@@ -23,8 +25,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", indexRouter);
 app.use("/users", usersRouter);
+app.use("/blog", blogRouter);
+app.use("/stats", statsRouter);
+app.use("/view", viewRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
