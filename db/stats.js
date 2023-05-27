@@ -68,7 +68,7 @@ async function getDailyViews(id) {
  */
 async function hitLike(post_id, user_id) {
   const result = await pool.query(
-    "INSERT INTO likes(post_id, user_id, like_time) VALUES (?, ?, CURRENT_TIMESTAMP);",
+    "INSERT INTO likes(post_id, user_id, like_time) VALUES (?, ?, CURRENT_TIMESTAMP)",
     [post_id, user_id]
   );
   return result;

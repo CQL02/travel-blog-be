@@ -10,13 +10,14 @@ var {
   editDetails,
   deleteUser,
   updateProfile,
+  addDefaultProfile,
   getProfileDetails,
   getProfileReview,
 } = require("../db/users");
 
 const upload = multer({ dest: "uploads/" });
 
-/** GET user by ID */
+/** GET user by ID - checked*/
 router.get("/:id", async function (req, res) {
   const id = req.params.id;
   const user = await getUser(id);
@@ -24,42 +25,60 @@ router.get("/:id", async function (req, res) {
 });
 
 /** GET user data to login */
-router.get("/login", async function (req, res) {
-  const { username, password } = req.body;
-  const exist = await login(username, password);
-  res.send(exist);
+
+router.get("/login/", (req, res) => {
+  // let username = req.query.username;
+  // let user_password = req.query.user_password;
+  // const result = await login(username, user_password);
+  let string = req.query.username + " " + req.query.user_password;
+  res.json({ name: string });
 });
 
-/** POST user register account */
-router.post("/register", async function (req, res) {
-  const { username, password, email } = req.body;
-  const result = await addUser(username, password, email);
-  res.status(201).send(result);
+router.get("/", async (req, res) => {
+  let string = req.query.username + " " + req.query.user_password;
+  res.json({ name: string });
 });
 
-/** GET user username whether the username is taken */
-router.get("/checkUsername", async function (req, res) {
-  const { username } = req.body;
+/** POST user register account - checked */
+router.post("/register", upload.single("user_image"), async (req, res) => {
+  const { username, user_password, user_email } = req.body;
+  const user_image = req.file;
+  try {
+    const result = await addUser(
+      username,
+      user_image,
+      user_password,
+      user_email
+    );
+    res.status(201).send(result);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+/** GET user username whether the username is taken - checked */
+router.get("/checkUsername/:username", async function (req, res) {
+  const username = req.params.username;
   const exist = await checkTakenUsername(username);
   res.send(exist);
 });
 
-/** DELETE user account */
+/** DELETE user account - checked*/
 router.delete("/delete/:id", async function (req, res) {
   const user_id = req.params.id;
   const result = await deleteUser(user_id);
   res.status(200).send(result);
 });
 
-/** PUT user new password */
+/** PUT user new password - checked */
 router.put("/updatePassword/:id", async function (req, res) {
   const id = req.params.id;
-  const { newPassword } = req.body;
-  const result = await updatePassword(newPassword, id);
+  const { user_password } = req.body;
+  const result = await updatePassword(user_password, id);
   res.status(200).send(result);
 });
 
-/** PUT user new image, email and username */
+/** PUT user new image, email and username - checked*/
 router.put(
   "/updateDetails/:id",
   upload.single("image"),
@@ -72,7 +91,7 @@ router.put(
   }
 );
 
-/** PUT user new profile bio */
+/** PUT user new profile bio - checked*/
 router.put("/updateProfile/:id", async function (req, res) {
   const id = req.params.id;
   const { country, phone, instagram, country_travelled, yoe, skills } =
@@ -89,7 +108,14 @@ router.put("/updateProfile/:id", async function (req, res) {
   res.status(200).send(result);
 });
 
-/** GET user_description by ID */
+/** POST user profile as default -checked */
+router.post("/createProfile/:id", async function (req, res) {
+  const id = req.params.id;
+  const result = await addDefaultProfile(id);
+  res.status(201).send(result);
+});
+
+/** GET user_descriptions by ID - checked*/
 router.get("/desc/:id", async function (req, res) {
   const id = req.params.id;
   const user = await getProfileDetails(id);
