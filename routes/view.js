@@ -14,7 +14,7 @@ var {
 
 const upload = multer({ dest: "uploads/" });
 
-/** POST post from user */
+/** POST post from user - checked*/
 router.post("/add", upload.single("image"), async function (req, res) {
   const { user_id, title, description, country } = req.body;
   const image = req.file;
@@ -22,7 +22,7 @@ router.post("/add", upload.single("image"), async function (req, res) {
   res.status(201).send(result);
 });
 
-/** PUT post to update post data */
+/** PUT post to update post data - checked*/
 router.put(
   "/posts/update/:id",
   upload.single("image"),

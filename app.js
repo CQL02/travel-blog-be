@@ -22,6 +22,7 @@ app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.query());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -45,5 +46,21 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error");
 });
+
+var { hitLike, getDailyLikes } = require("./db/stats");
+// async function testData() {
+//   // const userData = await addUser(
+//   //   "ali",
+//   //   "C:/Users/User/Desktop/WIF2003 WP/Assignment/travel-blog-be/_MG_0286.JPG",
+//   //   "123456",
+//   //   "ali@gmail.com"
+//   // );
+
+//   // const userData = await login("ali", "123456");
+
+//   const userData = await hitLike(1, 6);
+//   console.log(userData);
+// }
+// testData();
 
 module.exports = app;

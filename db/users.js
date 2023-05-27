@@ -1,5 +1,5 @@
 var pool = require("./db");
-var fs = require("fs");
+var fs = require("fs").promises;
 
 /**
  * function to get user details to display (use in blog, bloglist, profile, edit profile)
@@ -20,23 +20,24 @@ async function getUser(id) {
  * @returns 1 will be successfull, 0 will be fail
  */
 async function login(username, password) {
-  const [count] = await pool.query(
-    "SELECT COUNT(user_id) FROM users WHERE username = ? AND user_password = ?",
-    [username, password]
-  );
-  return count;
+  const query =
+    "SELECT COUNT(user_id) AS count FROM users WHERE username = ? AND user_password = ?";
+  const [result] = await pool.query(query, [username, password]);
+  return result;
 }
 
 /**
  * function to register new user account
  * @param {String} username
+ * @param {Blob} image
  * @param {String} password
  * @param {String} email
  */
-async function addUser(username, password, email) {
+async function addUser(username, image, password, email) {
+  const imageBuffer = await fs.readFile(image.path);
   const result = await pool.query(
-    "INSERT INTO users (username, user_password, user_email) VALUES (?, ?, ?)",
-    [username, password, email]
+    "INSERT INTO users (username, user_image, user_password, user_email) VALUES (?, ?, ?, ?)",
+    [username, imageBuffer, password, email]
   );
   return result;
 }
@@ -123,13 +124,26 @@ async function updateProfile(
 }
 
 /**
+ * function to set the default profile
+ * @param {Int} id - user_id
+ * @returns
+ */
+async function addDefaultProfile(id) {
+  const result = await pool.query(
+    "INSERT INTO user_descriptions (user_id, user_country, user_phone, user_ig, user_country_travelled, user_yoe, user_skills) VALUES (?,'-','-','-','-',0,'-')",
+    [id]
+  );
+  return result;
+}
+
+/**
  * function to get profile data (about)
  * @param {Int} id - user_id
  * @returns profile data (about) of user
  */
 async function getProfileDetails(id) {
   const [row] = await pool.query(
-    "SELECT * FROM user_description WHERE user_id = ?",
+    "SELECT * FROM user_descriptions WHERE user_id = ?",
     [id]
   );
   return row;
@@ -157,6 +171,7 @@ module.exports = {
   editDetails,
   deleteUser,
   updateProfile,
+  addDefaultProfile,
   getProfileDetails,
   getProfileReview,
 };
