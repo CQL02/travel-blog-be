@@ -35,41 +35,41 @@ router.put(
   }
 );
 
-/** GET post by post_id */
+/** GET post by post_id - checked*/
 router.get("/post/:id", async function (req, res) {
   const id = req.params.id;
   const post = await getPostByID(id);
   res.send(post);
 });
 
-/** GET post by searched title */
+/** GET post by searched title - checked*/
 router.get("/post/search/:search", async function (req, res) {
   const search = req.params.search;
   const posts = await getSearch(search);
   res.send(posts);
 });
 
-/** GET post by country */
+/** GET post by country - checked*/
 router.get("/post/country/:country", async function (req, res) {
   const country = req.params.country;
   const posts = await getPostByCountry(country);
   res.send(posts);
 });
 
-/** GET post by user_id */
+/** GET post by user_id - checked*/
 router.get("/post/user/:id", async function (req, res) {
   const id = req.params.id;
   const posts = await getPostByUserID(id);
   res.send(posts);
 });
 
-/** GET home recommand list (2nd to 10th) */
+/** GET home recommand list (2nd to 10th) - checked*/
 router.get("/home", async function (req, res) {
   const posts = await getHomeRecommand();
   res.send(posts);
 });
 
-/** GET home recommand list (top) */
+/** GET home recommand list (top) - checked*/
 router.get("/homeTop", async function (req, res) {
   const post = await getTopHomeRecommand();
   res.send(post);

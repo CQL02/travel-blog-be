@@ -3,12 +3,9 @@ var router = express.Router();
 var multer = require("multer");
 var {
   getUser,
-  login,
-  addUser,
   checkTakenUsername,
   updatePassword,
   editDetails,
-  deleteUser,
   updateProfile,
   addDefaultProfile,
   getProfileDetails,
@@ -20,40 +17,9 @@ const upload = multer({ dest: "uploads/" });
 /** GET user by ID - checked*/
 router.get("/:id", async function (req, res) {
   const id = req.params.id;
+  console.log(id);
   const user = await getUser(id);
   res.send(user);
-});
-
-/** GET user data to login */
-
-router.get("/login/", (req, res) => {
-  // let username = req.query.username;
-  // let user_password = req.query.user_password;
-  // const result = await login(username, user_password);
-  let string = req.query.username + " " + req.query.user_password;
-  res.json({ name: string });
-});
-
-router.get("/", async (req, res) => {
-  let string = req.query.username + " " + req.query.user_password;
-  res.json({ name: string });
-});
-
-/** POST user register account - checked */
-router.post("/register", upload.single("user_image"), async (req, res) => {
-  const { username, user_password, user_email } = req.body;
-  const user_image = req.file;
-  try {
-    const result = await addUser(
-      username,
-      user_image,
-      user_password,
-      user_email
-    );
-    res.status(201).send(result);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
 });
 
 /** GET user username whether the username is taken - checked */
@@ -61,13 +27,6 @@ router.get("/checkUsername/:username", async function (req, res) {
   const username = req.params.username;
   const exist = await checkTakenUsername(username);
   res.send(exist);
-});
-
-/** DELETE user account - checked*/
-router.delete("/delete/:id", async function (req, res) {
-  const user_id = req.params.id;
-  const result = await deleteUser(user_id);
-  res.status(200).send(result);
 });
 
 /** PUT user new password - checked */

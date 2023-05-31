@@ -8,9 +8,9 @@ var pool = require("./db");
 async function getStats(id) {
   const query = `
     SELECT
-      (SELECT AVG(comment_rating) FROM comments WHERE comment_time BETWEEN CURDATE() - INTERVAL 7 DAY AND CURDATE() AND user_id = ?) AS avg_reviews,
-      (SELECT COUNT(like_time) FROM likes WHERE like_time BETWEEN CURDATE() - INTERVAL 7 DAY AND CURDATE() AND user_id = ?) AS total_likes,
-      (SELECT COUNT(view_time) FROM views WHERE view_time BETWEEN CURDATE() - INTERVAL 7 DAY AND CURDATE() AND user_id = ?) AS total_views;
+      (SELECT AVG(comment_rating) FROM comments WHERE comment_time BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW()) + INTERVAL 1 DAY AND user_id = ?) AS avg_reviews,
+      (SELECT COUNT(like_time) FROM likes WHERE like_time BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW()) + INTERVAL 1 DAY AND user_id = ?) AS total_likes,
+      (SELECT COUNT(view_time) FROM views WHERE view_time BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW()) + INTERVAL 1 DAY AND user_id = ?) AS total_views;
   `;
   const [rows] = await pool.query(query, [id, id, id]);
   return rows[0];
@@ -24,15 +24,21 @@ async function getStats(id) {
 async function getDailyLikes(id) {
   const query = `
     SELECT
-      DATE(like_time) AS date,
-      COUNT(like_time) AS total_likes
+      DATE_FORMAT(date_table.date, '%d/%m/%Y') AS date,
+      COUNT(likes.like_time) AS total_likes
     FROM 
-      likes
+      (
+        SELECT CURDATE() - INTERVAL (days.d + (tens.d * 10) + (hundreds.d * 100)) DAY AS date
+        FROM
+          (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7) AS days,
+          (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS tens,
+          (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS hundreds
+      ) AS date_table
+    LEFT JOIN likes ON DATE(likes.like_time) = date_table.date AND likes.user_id = ?
     WHERE
-      like_time BETWEEN CURDATE() - INTERVAL 7 DAY AND CURDATE()
-      AND user_id = ?
+      date_table.date BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW())
     GROUP BY
-      DATE(like_time);
+      date_table.date;
   `;
   const [rows] = await pool.query(query, [id]);
   return rows;
@@ -46,15 +52,21 @@ async function getDailyLikes(id) {
 async function getDailyViews(id) {
   const query = `
     SELECT
-      DATE(view_time) AS date,
-      COUNT(ciew_time) AS total_views
+      DATE_FORMAT(date_table.date, '%d/%m/%Y') AS date,
+      COUNT(views.view_time) AS total_views
     FROM 
-      views
+      (
+        SELECT CURDATE() - INTERVAL (days.d + (tens.d * 10) + (hundreds.d * 100)) DAY AS date
+        FROM
+          (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7) AS days,
+          (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS tens,
+          (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS hundreds
+      ) AS date_table
+    LEFT JOIN views ON DATE(views.view_time) = date_table.date AND views.user_id = ?
     WHERE
-      view_time BETWEEN CURDATE() - INTERVAL 7 DAY AND CURDATE()
-      AND user_id = ?
+      date_table.date BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW())
     GROUP BY
-      DATE(view_time);
+      date_table.date;
   `;
   const [rows] = await pool.query(query, [id]);
   return rows;
@@ -88,10 +100,25 @@ async function addView(post_id, user_id) {
   return result;
 }
 
+/**
+ * function to unlike a post
+ * @param {Int} post_id
+ * @param {Int} user_id
+ * @returns
+ */
+async function unlike(post_id, user_id) {
+  const result = await pool.query(
+    "DELETE FROM likes WHERE post_id = ? AND user_id = ?",
+    [post_id, user_id]
+  );
+  return result;
+}
+
 module.exports = {
   getStats,
   getDailyLikes,
   getDailyViews,
   hitLike,
   addView,
+  unlike,
 };

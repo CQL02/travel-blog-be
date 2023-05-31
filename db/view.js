@@ -55,7 +55,7 @@ async function getPostByID(id) {
     INNER JOIN
       users u ON p.user_id = u.user_id
     LEFT JOIN
-      (SELECT post_id, COUNT(likes_time) AS total_likes FROM likes GROUP BY post_id) l ON p.post_id = l.post_id
+      (SELECT post_id, COUNT(like_time) AS total_likes FROM likes GROUP BY post_id) l ON p.post_id = l.post_id
     LEFT JOIN
       (SELECT post_id, COUNT(view_time) AS total_views FROM views GROUP BY post_id) v ON p.post_id = v.post_id
     LEFT JOIN
@@ -85,15 +85,16 @@ async function getSearch(search) {
     INNER JOIN
       users u ON p.user_id = u.user_id
     LEFT JOIN
-      (SELECT post_id, COUNT(likes_time) AS total_likes FROM likes GROUP BY post_id) l ON p.post_id = l.post_id
+      (SELECT post_id, COUNT(like_time) AS total_likes FROM likes GROUP BY post_id) l ON p.post_id = l.post_id
     LEFT JOIN
       (SELECT post_id, COUNT(view_time) AS total_views FROM views GROUP BY post_id) v ON p.post_id = v.post_id
     LEFT JOIN
       (SELECT post_id, AVG(comment_rating) AS average_rating FROM comments GROUP BY post_id) c ON p.post_id = c.post_id
     WHERE
-      p.post_title LIKE '%?%';
+      p.post_title LIKE ?;
   `;
-  const [rows] = await pool.query(query, [search]);
+  const searchPattern = `%${search}%`;
+  const [rows] = await pool.query(query, [searchPattern]);
   return rows;
 }
 
@@ -115,7 +116,7 @@ async function getPostByCountry(country) {
     INNER JOIN
       users u ON p.user_id = u.user_id
     LEFT JOIN
-      (SELECT post_id, COUNT(likes_time) AS total_likes FROM likes GROUP BY post_id) l ON p.post_id = l.post_id
+      (SELECT post_id, COUNT(like_time) AS total_likes FROM likes GROUP BY post_id) l ON p.post_id = l.post_id
     LEFT JOIN
       (SELECT post_id, COUNT(view_time) AS total_views FROM views GROUP BY post_id) v ON p.post_id = v.post_id
     LEFT JOIN
@@ -145,7 +146,7 @@ async function getPostByUserID(id) {
     INNER JOIN
       users u ON p.user_id = u.user_id
     LEFT JOIN
-      (SELECT post_id, COUNT(likes_time) AS total_likes FROM likes GROUP BY post_id) l ON p.post_id = l.post_id
+      (SELECT post_id, COUNT(like_time) AS total_likes FROM likes GROUP BY post_id) l ON p.post_id = l.post_id
     LEFT JOIN
       (SELECT post_id, COUNT(view_time) AS total_views FROM views GROUP BY post_id) v ON p.post_id = v.post_id
     LEFT JOIN
@@ -174,7 +175,7 @@ async function getHomeRecommand() {
     INNER JOIN
       users u ON p.user_id = u.user_id
     LEFT JOIN
-      (SELECT post_id, COUNT(likes_time) AS total_likes FROM likes GROUP BY post_id) l ON p.post_id = l.post_id
+      (SELECT post_id, COUNT(like_time) AS total_likes FROM likes GROUP BY post_id) l ON p.post_id = l.post_id
     LEFT JOIN
       (SELECT post_id, COUNT(view_time) AS total_views FROM views GROUP BY post_id) v ON p.post_id = v.post_id
     LEFT JOIN
@@ -204,7 +205,7 @@ async function getTopHomeRecommand() {
     INNER JOIN
       users u ON p.user_id = u.user_id
     LEFT JOIN
-      (SELECT post_id, COUNT(likes_time) AS total_likes FROM likes GROUP BY post_id) l ON p.post_id = l.post_id
+      (SELECT post_id, COUNT(like_time) AS total_likes FROM likes GROUP BY post_id) l ON p.post_id = l.post_id
     LEFT JOIN
       (SELECT post_id, COUNT(view_time) AS total_views FROM views GROUP BY post_id) v ON p.post_id = v.post_id
     LEFT JOIN

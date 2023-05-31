@@ -19,7 +19,7 @@ async function getPostByID(id) {
     INNER JOIN
       users u ON p.user_id = u.user_id
     LEFT JOIN
-      (SELECT post_id, COUNT(likes_time) AS total_likes FROM likes GROUP BY post_id) l ON p.post_id = l.post_id
+      (SELECT post_id, COUNT(like_time) AS total_likes FROM likes GROUP BY post_id) l ON p.post_id = l.post_id
     LEFT JOIN
       (SELECT post_id, COUNT(view_time) AS total_views FROM views GROUP BY post_id) v ON p.post_id = v.post_id
     LEFT JOIN
@@ -62,7 +62,7 @@ async function getComment(id) {
     INNER JOIN
       users ON comments.user_id = users.user_id
     WHERE
-      comment.post_id = ?;
+      comments.post_id = ?;
 `;
   const [rows] = await pool.query(query, [id]);
   return rows;
