@@ -14,14 +14,6 @@ var {
 
 const upload = multer({ dest: "uploads/" });
 
-/** GET user by ID - checked*/
-router.get("/:id", async function (req, res) {
-  const id = req.params.id;
-  console.log(id);
-  const user = await getUser(id);
-  res.send(user);
-});
-
 /** GET user username whether the username is taken - checked */
 router.get("/checkUsername/:username", async function (req, res) {
   const username = req.params.username;
@@ -85,6 +77,13 @@ router.get("/desc/:id", async function (req, res) {
 router.get("/review/:id", async function (req, res) {
   const id = req.params.id;
   const user = await getProfileReview(id);
+  res.send(user);
+});
+
+/** GET user by ID - checked*/
+router.get("/:id", async function (req, res) {
+  const id = req.params.id;
+  const user = await getUser(id);
   res.send(user);
 });
 
