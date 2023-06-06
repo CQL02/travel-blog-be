@@ -35,13 +35,6 @@ router.put(
   }
 );
 
-/** GET post by post_id - checked*/
-router.get("/post/:id", async function (req, res) {
-  const id = req.params.id;
-  const post = await getPostByID(id);
-  res.send(post);
-});
-
 /** GET post by searched title - checked*/
 router.get("/post/search/:search", async function (req, res) {
   const search = req.params.search;
@@ -72,6 +65,13 @@ router.get("/home", async function (req, res) {
 /** GET home recommand list (top) - checked*/
 router.get("/homeTop", async function (req, res) {
   const post = await getTopHomeRecommand();
+  res.send(post);
+});
+
+/** GET post by post_id - checked*/
+router.get("/post/:id", async function (req, res) {
+  const id = req.params.id;
+  const post = await getPostByID(id);
   res.send(post);
 });
 

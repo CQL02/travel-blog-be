@@ -9,7 +9,7 @@ var fs = require("fs").promises;
  */
 async function login(username, password) {
   const query =
-    "SELECT COUNT(user_id) AS count FROM users WHERE username = ? AND user_password = ?";
+    "SELECT user_id FROM users WHERE username = ? AND user_password = ?";
   const [result] = await pool.query(query, [username, password]);
   return result;
 }

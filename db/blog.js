@@ -56,7 +56,8 @@ async function getComment(id) {
   const query = `
     SELECT 
       comments.*, 
-      users.username
+      users.username,
+      users.user_image
     FROM 
       comments
     INNER JOIN
