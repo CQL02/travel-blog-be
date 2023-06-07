@@ -8,9 +8,9 @@ var pool = require("./db");
 async function getStats(id) {
   const query = `
     SELECT
-      (SELECT AVG(comment_rating) FROM comments WHERE comment_time BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW()) + INTERVAL 1 DAY AND user_id = ?) AS avg_reviews,
-      (SELECT COUNT(like_time) FROM likes WHERE like_time BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW()) + INTERVAL 1 DAY AND user_id = ?) AS total_likes,
-      (SELECT COUNT(view_time) FROM views WHERE view_time BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW()) + INTERVAL 1 DAY AND user_id = ?) AS total_views;
+      (SELECT AVG(comment_rating) FROM comments WHERE comment_time BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW()) + INTERVAL 1 DAY AND owner_id = ?) AS avg_reviews,
+      (SELECT COUNT(like_time) FROM likes WHERE like_time BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW()) + INTERVAL 1 DAY AND owner_id = ?) AS total_likes,
+      (SELECT COUNT(view_time) FROM views WHERE view_time BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW()) + INTERVAL 1 DAY AND owner_id = ?) AS total_views;
   `;
   const [rows] = await pool.query(query, [id, id, id]);
   return rows[0];
@@ -34,7 +34,7 @@ async function getDailyLikes(id) {
           (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS tens,
           (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS hundreds
       ) AS date_table
-    LEFT JOIN likes ON DATE(likes.like_time) = date_table.date AND likes.user_id = ?
+    LEFT JOIN likes ON DATE(likes.like_time) = date_table.date AND likes.owner_id = ?
     WHERE
       date_table.date BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW())
     GROUP BY
@@ -62,7 +62,7 @@ async function getDailyViews(id) {
           (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS tens,
           (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS hundreds
       ) AS date_table
-    LEFT JOIN views ON DATE(views.view_time) = date_table.date AND views.user_id = ?
+    LEFT JOIN views ON DATE(views.view_time) = date_table.date AND views.owner_id = ?
     WHERE
       date_table.date BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW())
     GROUP BY
@@ -76,12 +76,13 @@ async function getDailyViews(id) {
  * function to add like for the post
  * @param {Int} post_id
  * @param {Int} user_id
+ * @param {Int} owner_id - post's owner id
  * @returns
  */
-async function hitLike(post_id, user_id) {
+async function hitLike(post_id, user_id, owner_id) {
   const result = await pool.query(
-    "INSERT INTO likes(post_id, user_id, like_time) VALUES (?, ?, CURRENT_TIMESTAMP)",
-    [post_id, user_id]
+    "INSERT INTO likes(post_id, user_id, like_time, owner_id) VALUES (?, ?, CURRENT_TIMESTAMP, ?)",
+    [post_id, user_id, owner_id]
   );
   return result;
 }
@@ -90,12 +91,13 @@ async function hitLike(post_id, user_id) {
  * function to add view for the post
  * @param {Int} post_id
  * @param {Int} user_id
+ * @param {Int} owner_id - post's owner id
  * @returns
  */
-async function addView(post_id, user_id) {
+async function addView(post_id, user_id, owner_id) {
   const result = await pool.query(
-    "INSERT INTO views(post_id, user_id, view_time) VALUES (?, ?, CURRENT_TIMESTAMP);",
-    [post_id, user_id]
+    "INSERT INTO views(post_id, user_id, view_time, owner_id) VALUES (?, ?, CURRENT_TIMESTAMP, ?);",
+    [post_id, user_id, owner_id]
   );
   return result;
 }

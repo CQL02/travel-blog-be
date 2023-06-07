@@ -37,12 +37,19 @@ async function getPostByID(id) {
  * @param {Int} user_id
  * @param {Double} comment_rating
  * @param {Text} comment_desc
+ * @param {Int} owner_id - post's owner id
  * @returns
  */
-async function addComment(post_id, user_id, comment_rating, comment_desc) {
+async function addComment(
+  post_id,
+  user_id,
+  comment_rating,
+  comment_desc,
+  owner_id
+) {
   const result = await pool.query(
-    "INSERT INTO comments(post_id, user_id, comment_rating, comment_description, comment_time) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP);",
-    [post_id, user_id, comment_rating, comment_desc]
+    "INSERT INTO comments(post_id, user_id, comment_rating, comment_description, comment_time, owner_id) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?);",
+    [post_id, user_id, comment_rating, comment_desc, owner_id]
   );
   return result;
 }

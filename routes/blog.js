@@ -11,12 +11,13 @@ router.get("/:id", async function (req, res) {
 
 /** POST comments from user - checked*/
 router.post("/comment", async function (req, res) {
-  const { post_id, user_id, comment_rating, comment_desc } = req.body;
+  const { post_id, user_id, comment_rating, comment_desc, owner_id } = req.body;
   const result = await addComment(
     post_id,
     user_id,
     comment_rating,
-    comment_desc
+    comment_desc,
+    owner_id
   );
   res.status(201).send(result);
 });

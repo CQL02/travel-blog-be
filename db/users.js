@@ -112,12 +112,12 @@ async function getProfileDetails(id) {
 
 /**
  * function to get total review of the user
- * @param {Int} id - user_id
+ * @param {Int} id - owner_id
  * @returns
  */
 async function getProfileReview(id) {
   const result = await pool.query(
-    "SELECT AVG(comment_rating) AS rating FROM comments WHERE user_id = ?",
+    "SELECT AVG(comment_rating) AS rating FROM comments WHERE owner_id = ?",
     [id]
   );
   return result;
