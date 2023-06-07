@@ -12,8 +12,8 @@ const {
 /** POST like from user - checked*/
 router.post("/like", async function (req, res) {
   try {
-    const { post_id, user_id } = req.body;
-    const result = await hitLike(post_id, user_id);
+    const { post_id, user_id, owner_id } = req.body;
+    const result = await hitLike(post_id, user_id, owner_id);
     res.status(201).send(result);
   } catch (error) {
     res.status(500).send("Error: " + error.message);
@@ -34,15 +34,15 @@ router.delete("/like", async function (req, res) {
 /** POST view from user - checked*/
 router.post("/view", async function (req, res) {
   try {
-    const { post_id, user_id } = req.body;
-    const result = await addView(post_id, user_id);
+    const { post_id, user_id, owner_id } = req.body;
+    const result = await addView(post_id, user_id, owner_id);
     res.status(201).send(result);
   } catch (error) {
     res.status(500).send("Error: " + error.message);
   }
 });
 
-/** GET statistics by user_id - checked*/
+/** GET statistics by owner_id - checked*/
 router.get("/stats/:id", async function (req, res) {
   try {
     const id = req.params.id;
@@ -53,7 +53,7 @@ router.get("/stats/:id", async function (req, res) {
   }
 });
 
-/** GET likes by user_id for the past week - checked*/
+/** GET likes by owner_id for the past week - checked*/
 router.get("/likes/:id", async function (req, res) {
   try {
     const id = req.params.id;
@@ -64,7 +64,7 @@ router.get("/likes/:id", async function (req, res) {
   }
 });
 
-/** GET views by user_id for the past week - checked*/
+/** GET views by owner_id for the past week - checked*/
 router.get("/views/:id", async function (req, res) {
   try {
     const id = req.params.id;
