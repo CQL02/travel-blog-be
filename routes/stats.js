@@ -2,8 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {
   getStats,
-  getDailyLikes,
-  getDailyViews,
+  getDailyStats,
   hitLike,
   addView,
   unlike,
@@ -54,22 +53,11 @@ router.get("/stats/:id", async function (req, res) {
 });
 
 /** GET likes by owner_id for the past week - checked*/
-router.get("/likes/:id", async function (req, res) {
+router.get("/dailyStats/:id", async function (req, res) {
   try {
     const id = req.params.id;
-    const likes = await getDailyLikes(id);
+    const likes = await getDailyStats(id);
     res.send(likes);
-  } catch (error) {
-    res.status(500).send("Error: " + error.message);
-  }
-});
-
-/** GET views by owner_id for the past week - checked*/
-router.get("/views/:id", async function (req, res) {
-  try {
-    const id = req.params.id;
-    const views = await getDailyViews(id);
-    res.send(views);
   } catch (error) {
     res.status(500).send("Error: " + error.message);
   }
