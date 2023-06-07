@@ -29,11 +29,28 @@ async function addPost(user_id, title, image, description, country) {
  * @returns
  */
 async function updatePost(title, image, description, country, id) {
-  const imageBuffer = await fs.readFile(image.path);
-  const result = await pool.query(
-    "UPDATE posts SET post_title = ?, post_image = ?, post_description = ?, post_country = ? WHERE post_id = ?",
-    [title, imageBuffer, description, country, id]
-  );
+  try {
+    const imageBuffer = await fs.readFile(image.path);
+    const result = await pool.query(
+      "UPDATE posts SET post_title = ?, post_image = ?, post_description = ?, post_country = ? WHERE post_id = ?",
+      [title, imageBuffer, description, country, id]
+    );
+    return result;
+  } catch (error) {
+    console.error("Error updating post:", error);
+    throw error;
+  }
+}
+
+/**
+ * function to delete post
+ * @param {Int} post_id
+ * @returns
+ */
+async function deletePost(post_id) {
+  const result = await pool.query("DELETE FROM posts WHERE post_id = ?", [
+    post_id,
+  ]);
   return result;
 }
 
@@ -221,6 +238,7 @@ async function getTopHomeRecommand() {
 module.exports = {
   addPost,
   updatePost,
+  deletePost,
   getPostByID,
   getSearch,
   getPostByCountry,

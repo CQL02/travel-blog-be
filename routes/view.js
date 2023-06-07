@@ -4,6 +4,7 @@ var multer = require("multer");
 var {
   addPost,
   updatePost,
+  deletePost,
   getPostByID,
   getSearch,
   getPostByCountry,
@@ -34,6 +35,13 @@ router.put(
     res.status(200).send(result);
   }
 );
+
+/** DELETE post by post_id */
+router.delete("/post/delete/:id", async (req, res) => {
+  const id = req.params.id;
+  const result = await deletePost(id);
+  res.status(201).send(result);
+});
 
 /** GET post by searched title - checked*/
 router.get("/post/search/:search", async function (req, res) {

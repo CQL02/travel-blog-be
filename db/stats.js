@@ -17,58 +17,34 @@ async function getStats(id) {
 }
 
 /**
- * function to get total likes of each day in past week
- * @param {Int} id - user_id
- * @returns total likes of each day in past week
- */
-async function getDailyLikes(id) {
-  const query = `
-    SELECT
-      DATE_FORMAT(date_table.date, '%d/%m/%Y') AS date,
-      COUNT(likes.like_time) AS total_likes
-    FROM 
-      (
-        SELECT CURDATE() - INTERVAL (days.d + (tens.d * 10) + (hundreds.d * 100)) DAY AS date
-        FROM
-          (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7) AS days,
-          (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS tens,
-          (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS hundreds
-      ) AS date_table
-    LEFT JOIN likes ON DATE(likes.like_time) = date_table.date AND likes.owner_id = ?
-    WHERE
-      date_table.date BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW())
-    GROUP BY
-      date_table.date;
-  `;
-  const [rows] = await pool.query(query, [id]);
-  return rows;
-}
-
-/**
  * function to get total views of each day in past week
  * @param {Int} id - user_id
- * @returns total views of each day in past week
+ * @returns total views and likes of each day in past week
  */
-async function getDailyViews(id) {
+async function getDailyStats(id) {
   const query = `
     SELECT
       DATE_FORMAT(date_table.date, '%d/%m/%Y') AS date,
+      COUNT(likes.like_time) AS total_likes,
       COUNT(views.view_time) AS total_views
     FROM 
       (
         SELECT CURDATE() - INTERVAL (days.d + (tens.d * 10) + (hundreds.d * 100)) DAY AS date
         FROM
-          (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7) AS days,
-          (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS tens,
-          (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS hundreds
+            (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7) AS days,
+            (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS tens,
+            (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS hundreds
       ) AS date_table
+    LEFT JOIN likes ON DATE(likes.like_time) = date_table.date AND likes.owner_id = ?
     LEFT JOIN views ON DATE(views.view_time) = date_table.date AND views.owner_id = ?
     WHERE
-      date_table.date BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW())
+        date_table.date BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW())
     GROUP BY
-      date_table.date;
+        date_table.date
+    ORDER BY
+        date_table.date ASC;
   `;
-  const [rows] = await pool.query(query, [id]);
+  const [rows] = await pool.query(query, [id, id]);
   return rows;
 }
 
@@ -118,8 +94,7 @@ async function unlike(post_id, user_id) {
 
 module.exports = {
   getStats,
-  getDailyLikes,
-  getDailyViews,
+  getDailyStats,
   hitLike,
   addView,
   unlike,
