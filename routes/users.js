@@ -7,7 +7,6 @@ var {
   updatePassword,
   editDetails,
   updateProfile,
-  addDefaultProfile,
   getProfileDetails,
   getProfileReview,
 } = require("../db/users");
@@ -43,7 +42,7 @@ router.put(
 );
 
 /** PUT user new profile bio - checked*/
-router.put("/updateProfile/:id", async function (req, res) {
+router.put("/updateProfile/:id", upload.none(), async function (req, res) {
   const id = req.params.id;
   const { country, phone, instagram, country_travelled, yoe, skills } =
     req.body;
@@ -57,13 +56,6 @@ router.put("/updateProfile/:id", async function (req, res) {
     id
   );
   res.status(200).send(result);
-});
-
-/** POST user profile as default -checked */
-router.post("/createProfile/:id", async function (req, res) {
-  const id = req.params.id;
-  const result = await addDefaultProfile(id);
-  res.status(201).send(result);
 });
 
 /** GET user_descriptions by ID - checked*/
