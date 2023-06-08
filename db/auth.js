@@ -23,11 +23,11 @@ async function login(username, password) {
  */
 async function addUser(username, image, password, email) {
   const imageBuffer = await fs.readFile(image.path);
-  const result = await pool.query(
+  const [result] = await pool.query(
     "INSERT INTO users (username, user_image, user_password, user_email) VALUES (?, ?, ?, ?)",
     [username, imageBuffer, password, email]
   );
-  return result;
+  return { ...result, user_id: result.insertId };
 }
 
 /**
@@ -40,4 +40,17 @@ async function deleteUser(id) {
   return result;
 }
 
-module.exports = { login, addUser, deleteUser };
+/**
+ * function to delete the user's description
+ * @param {Int} id - user_id
+ * @returns
+ */
+async function deleteUserDesc(id) {
+  const result = await pool.query(
+    "DELETE FROM user_descriptions WHERE user_id = ?",
+    [id]
+  );
+  return result;
+}
+
+module.exports = { login, addUser, deleteUser, deleteUserDesc };
