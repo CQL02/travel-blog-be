@@ -92,10 +92,40 @@ async function unlike(post_id, user_id) {
   return result;
 }
 
+/**
+ * function to check whether user like the post
+ * @param {Int} post_id
+ * @param {Int} user_id
+ * @returns
+ */
+async function getLike(post_id, user_id) {
+  const result = await pool.query(
+    "SELECT COUNT(post_id) AS count FROM likes WHERE post_id = ? AND user_id = ?",
+    [post_id, user_id]
+  );
+  return result;
+}
+
+/**
+ * function to check whether user viewed the post
+ * @param {Int} post_id
+ * @param {Int} user_id
+ * @returns
+ */
+async function getView(post_id, user_id) {
+  const result = await pool.query(
+    "SELECT COUNT(post_id) AS count FROM views WHERE post_id = ? AND user_id = ?",
+    [post_id, user_id]
+  );
+  return result;
+}
+
 module.exports = {
   getStats,
   getDailyStats,
   hitLike,
   addView,
   unlike,
+  getLike,
+  getView,
 };
