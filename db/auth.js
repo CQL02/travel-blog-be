@@ -53,4 +53,18 @@ async function deleteUserDesc(id) {
   return result;
 }
 
-module.exports = { login, addUser, deleteUser, deleteUserDesc };
+async function deleteAll(user_id) {
+  try {
+    await pool.query("DELETE FROM posts WHERE user_id = ?", [user_id]);
+    await pool.query("DELETE FROM likes WHERE user_id = ?", [user_id]);
+    await pool.query("DELETE FROM comments WHERE user_id = ?", [user_id]);
+    await pool.query("DELETE FROM views WHERE user_id = ?", [user_id]);
+
+    return { success: true, message: "User deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return { success: false, message: "Error deleting user" };
+  }
+}
+
+module.exports = { login, addUser, deleteUser, deleteUserDesc, deleteAll };

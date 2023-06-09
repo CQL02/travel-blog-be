@@ -6,6 +6,8 @@ const {
   hitLike,
   addView,
   unlike,
+  getLike,
+  getView,
 } = require("../db/stats");
 
 /** POST like from user - checked*/
@@ -22,7 +24,7 @@ router.post("/like", async function (req, res) {
 /** DELETE like from post - checked*/
 router.delete("/like", async function (req, res) {
   try {
-    const { post_id, user_id } = req.body;
+    const { post_id, user_id } = req.query;
     const result = await unlike(post_id, user_id);
     res.status(200).send(result);
   } catch (error) {
@@ -58,6 +60,28 @@ router.get("/dailyStats/:id", async function (req, res) {
     const id = req.params.id;
     const likes = await getDailyStats(id);
     res.send(likes);
+  } catch (error) {
+    res.status(500).send("Error: " + error.message);
+  }
+});
+
+/** GET whether the user liked the post*/
+router.get("/checkLike", async function (req, res) {
+  try {
+    const { post_id, user_id } = req.query;
+    const like = await getLike(post_id, user_id);
+    res.send(like[0]);
+  } catch (error) {
+    res.status(500).send("Error: " + error.message);
+  }
+});
+
+/** GET whether the user liked the post*/
+router.get("/checkView", async function (req, res) {
+  try {
+    const { post_id, user_id } = req.query;
+    const view = await getView(post_id, user_id);
+    res.send(view[0]);
   } catch (error) {
     res.status(500).send("Error: " + error.message);
   }

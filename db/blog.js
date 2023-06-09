@@ -55,6 +55,19 @@ async function addComment(
 }
 
 /**
+ * function to delete comment
+ * @param {Int} comment_id
+ * @returns
+ */
+async function deleteComment(comment_id) {
+  const result = await pool.query(
+    "DELETE FROM comments WHERE comment_id = ?;",
+    [comment_id]
+  );
+  return result;
+}
+
+/**
  * function to get all comment of one post
  * @param {Int} id - post_id
  * @returns all comments of that selected post
@@ -76,4 +89,4 @@ async function getComment(id) {
   return rows;
 }
 
-module.exports = { getPostByID, addComment, getComment };
+module.exports = { getPostByID, addComment, getComment, deleteComment };
