@@ -4,6 +4,7 @@ var multer = require("multer");
 var {
   login,
   addUser,
+  usernameEmailCheck,
   deleteUser,
   deleteUserDesc,
   deleteAll,
@@ -56,6 +57,13 @@ router.delete("/deleteAll/:id", async function (req, res) {
 router.get("/login", async (req, res) => {
   const { username, user_password } = req.query;
   const result = await login(username, user_password);
+  res.send(result);
+});
+
+/** GET user data to login */
+router.post("/check-email-username", async (req, res) => {
+  const { username, user_email } = req.body;
+  const result = await usernameEmailCheck(username, user_email);
   res.send(result);
 });
 

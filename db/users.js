@@ -20,7 +20,7 @@ async function getUser(id) {
  */
 async function checkTakenUsername(username) {
   const [count] = await pool.query(
-    "SELECT COUNT(user_id) FROM users WHERE username = ?",
+    "SELECT username FROM users WHERE username = ?",
     [username]
   );
   return count;

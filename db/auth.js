@@ -5,12 +5,25 @@ var fs = require("fs").promises;
  * Function to check correct username and password
  * @param {String} username - username user key in
  * @param {String} password - password user key in
- * @returns 1 will be successfull, 0 will be fail
+ * @returns user_id
  */
 async function login(username, password) {
   const query =
     "SELECT user_id FROM users WHERE username = ? AND user_password = ?";
   const [result] = await pool.query(query, [username, password]);
+  return result;
+}
+
+/**
+ * Function to check correct username and password
+ * @param {String} username - username user key in
+ * @param {String} email - email user key in
+ * @returns user_id
+ */
+async function usernameEmailCheck(username, email) {
+  const query =
+    "SELECT user_id FROM users WHERE username = ? AND user_email = ?";
+  const [result] = await pool.query(query, [username, email]);
   return result;
 }
 
@@ -67,4 +80,11 @@ async function deleteAll(user_id) {
   }
 }
 
-module.exports = { login, addUser, deleteUser, deleteUserDesc, deleteAll };
+module.exports = {
+  login,
+  usernameEmailCheck,
+  addUser,
+  deleteUser,
+  deleteUserDesc,
+  deleteAll,
+};
