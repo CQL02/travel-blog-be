@@ -1,20 +1,21 @@
-var createError = require("http-errors");
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
+const createError = require("http-errors");
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
-var logger = require("morgan");
-var cors = require("cors");
-var dotenv = require("dotenv");
+const logger = require("morgan");
+const cors = require("cors");
+const dotenv = require("dotenv");
 
 dotenv.config();
-var usersRouter = require("./routes/users");
-var blogRouter = require("./routes/blog");
-var statsRouter = require("./routes/stats");
-var viewRouter = require("./routes/view");
-var authRouter = require("./routes/auth");
+const usersRouter = require("./routes/users");
+const blogRouter = require("./routes/blog");
+const statsRouter = require("./routes/stats");
+const viewRouter = require("./routes/view");
+const authRouter = require("./routes/auth");
+const emailRouter = require("./routes/email");
 
-var app = express();
+const app = express();
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -33,6 +34,7 @@ app.use("/blog", blogRouter);
 app.use("/stats", statsRouter);
 app.use("/view", viewRouter);
 app.use("/auth", authRouter);
+app.use("/email", emailRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -49,21 +51,5 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error");
 });
-
-// var { login } = require("./db/auth");
-// async function testData() {
-//   // const userData = await addUser(
-//   //   "ali",
-//   //   "C:/Users/User/Desktop/WIF2003 WP/Assignment/travel-blog-be/_MG_0286.JPG",
-//   //   "123456",
-//   //   "ali@gmail.com"
-//   // );
-
-//   const userData = await login("ali", "123456");
-
-//   // const userData = await hitLike(1, 6);
-//   console.log(userData);
-// }
-// testData();
 
 module.exports = app;
