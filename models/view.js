@@ -1,5 +1,5 @@
-var pool = require("./db");
-var fs = require("fs").promises;
+const pool = require("../config/dbConfig");
+const fs = require("fs").promises;
 
 /**
  * function to create post

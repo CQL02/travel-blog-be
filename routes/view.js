@@ -1,86 +1,45 @@
-var express = require("express");
-var router = express.Router();
-var multer = require("multer");
-var {
-  addPost,
-  updatePost,
-  deletePost,
-  getPostByID,
-  getSearch,
-  getPostByCountry,
-  getPostByUserID,
-  getHomeRecommand,
-  getTopHomeRecommand,
-} = require("../db/view");
+const express = require("express");
+const router = express.Router();
+const multer = require("multer");
+const {
+  createPost,
+  putPost,
+  delPost,
+  searchPostSearch,
+  searchPostCountry,
+  searchPostUser,
+  getHome,
+  getHomeTop,
+  getPostPostID,
+} = require("../controllers/view");
 
 const upload = multer({ dest: "uploads/" });
 
 /** POST post from user - checked*/
-router.post("/add", upload.single("image"), async function (req, res) {
-  const { user_id, title, description, country } = req.body;
-  const image = req.file;
-  const result = await addPost(user_id, title, image, description, country);
-  res.status(201).send(result);
-});
+router.post("/add", upload.single("image"), createPost);
 
 /** PUT post to update post data - checked*/
-router.put(
-  "/posts/update/:id",
-  upload.single("image"),
-  async function (req, res) {
-    const id = req.params.id;
-    const { title, description, country } = req.body;
-    const image = req.file;
-    const result = await updatePost(title, image, description, country, id);
-    res.status(200).send(result);
-  }
-);
+router.put("/posts/update/:id", upload.single("image"), putPost);
 
 /** DELETE post by post_id */
-router.delete("/post/delete/:id", async (req, res) => {
-  const id = req.params.id;
-  const result = await deletePost(id);
-  res.status(201).send(result);
-});
+router.delete("/post/delete/:id", delPost);
 
 /** GET post by searched title - checked*/
-router.get("/post/search/:search", async function (req, res) {
-  const search = req.params.search;
-  const posts = await getSearch(search);
-  res.send(posts);
-});
+router.get("/post/search/:search", searchPostSearch);
 
 /** GET post by country - checked*/
-router.get("/post/country/:country", async function (req, res) {
-  const country = req.params.country;
-  const posts = await getPostByCountry(country);
-  res.send(posts);
-});
+router.get("/post/country/:country", searchPostCountry);
 
 /** GET post by user_id - checked*/
-router.get("/post/user/:id", async function (req, res) {
-  const id = req.params.id;
-  const posts = await getPostByUserID(id);
-  res.send(posts);
-});
+router.get("/post/user/:id", searchPostUser);
 
 /** GET home recommand list (2nd to 10th) - checked*/
-router.get("/home", async function (req, res) {
-  const posts = await getHomeRecommand();
-  res.send(posts);
-});
+router.get("/home", getHome);
 
 /** GET home recommand list (top) - checked*/
-router.get("/homeTop", async function (req, res) {
-  const post = await getTopHomeRecommand();
-  res.send(post);
-});
+router.get("/homeTop", getHomeTop);
 
 /** GET post by post_id - checked*/
-router.get("/post/:id", async function (req, res) {
-  const id = req.params.id;
-  const post = await getPostByID(id);
-  res.send(post);
-});
+router.get("/post/:id", getPostPostID);
 
 module.exports = router;

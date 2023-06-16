@@ -1,21 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { sendEmail, sendVerificationEmail } = require("../controller/email");
+const { sendFeedback, sendVeriEmail } = require("../controllers/email");
 
-router.post("/send-email", (req, res) => {
-  const { subject, text } = req.body;
+/** POST feedback and sent it trhough email */
+router.post("/send-email", sendFeedback);
 
-  sendEmail(subject, text);
-
-  res.json({ message: "Email sent" });
-});
-
-router.post("/send-verification-email", (req, res) => {
-  const { to } = req.body;
-
-  const code = sendVerificationEmail(to);
-
-  res.json({ code });
-});
+router.post("/send-verification-email", sendVeriEmail);
 
 module.exports = router;

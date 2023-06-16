@@ -1,4 +1,4 @@
-var pool = require("./db");
+const pool = require("../config/dbConfig");
 
 /**
  * function to get the total likes, views and average rating in the past week
