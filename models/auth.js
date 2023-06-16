@@ -1,5 +1,6 @@
-var pool = require("./db");
-var fs = require("fs").promises;
+const pool = require("../config/dbConfig");
+const fs = require("fs").promises;
+const { comparePasswords } = require("../services/encryption");
 
 /**
  * Function to check correct username and password
@@ -7,11 +8,20 @@ var fs = require("fs").promises;
  * @param {String} password - password user key in
  * @returns user_id
  */
-async function login(username, password) {
-  const query =
-    "SELECT user_id FROM users WHERE username = ? AND user_password = ?";
-  const [result] = await pool.query(query, [username, password]);
-  return result;
+async function login(username, user_password) {
+  const query = "SELECT user_id, user_password FROM users WHERE username = ?";
+  const [result] = await pool.query(query, [username]);
+
+  if (result.length === 0) {
+    return result;
+  }
+
+  const hashedPassword = result[0].user_password;
+  const match = await comparePasswords(user_password, hashedPassword);
+
+  return match
+    ? [{ user_id: result[0].user_id, user_password: user_password }]
+    : [];
 }
 
 /**

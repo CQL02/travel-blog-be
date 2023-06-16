@@ -1,4 +1,4 @@
-var pool = require("./db");
+const pool = require("../config/dbConfig");
 
 /**
  * function to get all data of selected blog

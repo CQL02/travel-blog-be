@@ -1,44 +1,22 @@
-var express = require("express");
-var router = express.Router();
-var {
-  getPostByID,
-  addComment,
-  getComment,
-  deleteComment,
-} = require("../db/blog");
+const express = require("express");
+const router = express.Router();
+const {
+  getPost,
+  newComment,
+  getAllComment,
+  delComment,
+} = require("../controllers/blog");
 
 /** GET post by ID */
-router.get("/:id", async function (req, res) {
-  const id = req.params.id;
-  const post = await getPostByID(id);
-  res.send(post);
-});
+router.get("/:id", getPost);
 
 /** POST comments from user*/
-router.post("/comment", async function (req, res) {
-  const { post_id, user_id, comment_rating, comment_desc, owner_id } = req.body;
-  const result = await addComment(
-    post_id,
-    user_id,
-    comment_rating,
-    comment_desc,
-    owner_id
-  );
-  res.status(201).send(result);
-});
+router.post("/comment", newComment);
 
 /** GET comments by post_id */
-router.get("/comments/:id", async function (req, res) {
-  const id = req.params.id;
-  const comments = await getComment(id);
-  res.send(comments);
-});
+router.get("/comments/:id", getAllComment);
 
 /** DELETE comments by comment_id */
-router.delete("/delComment/:id", async function (req, res) {
-  const id = req.params.id;
-  const comment = await deleteComment(id);
-  res.send(comment);
-});
+router.delete("/delComment/:id", delComment);
 
 module.exports = router;
