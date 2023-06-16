@@ -30,7 +30,7 @@ async function registerUser(req, res) {
 
 async function loginUser(req, res) {
   try {
-    const { username, user_password } = req.query;
+    const { username, user_password } = req.body;
     const result = await login(username, user_password);
     res.send(result);
   } catch (error) {
