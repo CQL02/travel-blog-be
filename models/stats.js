@@ -25,24 +25,32 @@ async function getDailyStats(id) {
   const query = `
     SELECT
       DATE_FORMAT(date_table.date, '%d/%m/%Y') AS date,
-      COUNT(likes.like_time) AS total_likes,
-      COUNT(views.view_time) AS total_views
+      COALESCE(likes.total_likes, 0) AS total_likes,
+      COALESCE(views.total_views, 0) AS total_views
     FROM 
       (
         SELECT CURDATE() - INTERVAL (days.d + (tens.d * 10) + (hundreds.d * 100)) DAY AS date
         FROM
-            (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7) AS days,
-            (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS tens,
-            (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS hundreds
+          (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7) AS days,
+          (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS tens,
+          (SELECT 0 AS d UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) AS hundreds
       ) AS date_table
-    LEFT JOIN likes ON DATE(likes.like_time) = date_table.date AND likes.owner_id = ?
-    LEFT JOIN views ON DATE(views.view_time) = date_table.date AND views.owner_id = ?
+    LEFT JOIN (
+      SELECT DATE(like_time) AS like_date, COUNT(like_time) AS total_likes
+      FROM likes
+      WHERE owner_id = ?
+      GROUP BY like_date
+    ) AS likes ON date_table.date = likes.like_date
+    LEFT JOIN (
+      SELECT DATE(view_time) AS view_date, COUNT(view_time) AS total_views
+      FROM views
+      WHERE owner_id = ?
+      GROUP BY view_date
+    ) AS views ON date_table.date = views.view_date
     WHERE
-        date_table.date BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW())
-    GROUP BY
-        date_table.date
+      date_table.date BETWEEN DATE(NOW()) - INTERVAL 6 DAY AND DATE(NOW())
     ORDER BY
-        date_table.date ASC;
+      date_table.date ASC;
   `;
   const [rows] = await pool.query(query, [id, id]);
   return rows;
