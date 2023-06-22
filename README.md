@@ -19,4 +19,5 @@ Run the development server:
 npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The backend will be using port '8080'.
+Connect frontend with [http://localhost:8080](http://localhost:8080).
