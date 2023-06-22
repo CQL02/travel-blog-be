@@ -20,4 +20,4 @@ npm start
 ```
 
 The backend will be using port '8080'.
-Connect frontend with [http://localhost:8080](http://localhost:8080).
+Connect by using [http://localhost:8080](http://localhost:8080).
